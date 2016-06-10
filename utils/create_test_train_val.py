@@ -48,12 +48,14 @@ from random import shuffle
 import math
 import glob
 import math
+import config
 
 if __name__ == "__main__":
 
    # TODO make it so the user can delete the files in the test train val dirs if they run this script
    # twice, could be useful if they get more data or want to change the split size
 
+   """
    if len(sys.argv) < 2:
       print
       print "Usage: python create_test_train_val.py [dataset]"
@@ -65,6 +67,7 @@ if __name__ == "__main__":
          print "$DATA_DIR not set. Set with `export DATA_DIR=/path/to/data_root` or put in ~/.bashrc"
       print
       exit()
+   """
 
    # split parameters
    train_perc = .80
@@ -72,10 +75,12 @@ if __name__ == "__main__":
    val_perc   = .1
 
    # name of the dataset, i.e the folder name in $DATA_DIR
-   dataset = sys.argv[1]
+   # dataset = sys.argv[1]
+   dataset = config.dataset
 
    # the main directory containing all datasets
-   data_dir  = os.environ['DATA_DIR']
+   #data_dir  = os.environ['DATA_DIR']
+   data_dir = config.data_dir
   
    # the directory of the dataset we are using 
    dataset_dir = data_dir + "/" + dataset + "/images"
