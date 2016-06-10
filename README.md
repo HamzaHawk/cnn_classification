@@ -1,7 +1,8 @@
 ## Scripts for handling data in tensorflow
 
 #### Important
-The DATA_DIR environment variable must NOT have an ending slash
+update: config.py contains variables specific to this app. This is so these scripts can be easily
+copied over to another dataset or project, also less messy than using an environment variable
 
 ### `create_test_train_val.py`
 This script takes in a root data folder containing images labeled by the subdirectory they are in,
