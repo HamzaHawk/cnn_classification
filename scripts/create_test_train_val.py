@@ -33,6 +33,7 @@ tensorflow requires the folder structure to be:
 
 """
 
+import ntpath
 import os
 import sys
 from random import shuffle
@@ -46,8 +47,15 @@ if __name__ == "__main__":
    # twice, could be useful if they get more data or want to change the split size
 
    if len(sys.argv) < 2:
-      print "Usage: python create_test_train_val.py [dataset_directory]"
+      print
+      print "Usage: python create_test_train_val.py [dataset]"
+      print "[dataset] is the name of your dataset (the directory name) in $DATA_DIR"
       print "Do not put a / at the end of the directory name"
+      try:
+         print "Current $DATA_DIR: " + str(os.environ['DATA_DIR'])
+      except:
+         print "$DATA_DIR not set. Set with `export DATA_DIR=/path/to/data_root` or put in ~/.bashrc"
+      print
       exit()
 
    # split parameters
@@ -84,9 +92,10 @@ if __name__ == "__main__":
    try:
       os.mkdir(data_dir + "/" + dataset + "/test")
       os.mkdir(data_dir + "/" + dataset + "/train")
-      os.mkdir(data_dir + "/" + dataset+"/val")
+      os.mkdir(data_dir + "/" + dataset + "/val")
    except:
-      print "Directory already exists"
+      pass
+      #print "Directory already exists"
 
    # the label_list was created from the directory, so just go through that
    for label in label_list:
@@ -105,59 +114,36 @@ if __name__ == "__main__":
       test_set  = image_list[train_num:train_num+test_num]
       val_set   = image_list[train_num+test_num:]
 
-      # create a directory for each label
+      # create a directory for the current label in test, val, and train
       try:
-         
+         os.mkdir(data_dir + "/" + dataset + "/train/" + label)
+         os.mkdir(data_dir + "/" + dataset + "/test/" + label)
+         os.mkdir(data_dir + "/" + dataset + "/val/" + label)
       except:
-         print "Directory already exists..."
+         continue   
+     
+      # now symlink the images in each list to their respective directory 
+      for image in test_set:
+         im_name = ntpath.basename(image)
+         try:
+            os.symlink(image, data_dir+"/"+dataset+"/test/"+label+"/"+im_name)
+         except:
+            continue
+      
+      for image in train_set:
+         im_name = ntpath.basename(image)
+         try:
+            os.symlink(image, data_dir+"/"+dataset+"/train/"+label+"/"+im_name)
+         except:
+            continue
 
-'''
-   for root, dirs, files in os.walk(dataset_dir):
-      for d in dirs:
-         current_label = d
-         print current_label
-         for r, d, f in os.walk(dataset_dir+"/"+d):
-            for image in f:
-               print image
-            exit()
+      for image in val_set:
+         im_name = ntpath.basename(image)
+         try:
+            os.symlink(image, data_dir+"/"+dataset+"/val/"+label+"/"+im_name)
+         except:
+            continue
 
-            try:
-               os.mkdir(val_dir+"/"+d)
-               print "Created directory " + var_dir+"/"+d
-            except:
-               print "Directory " + val_dir + "/" + d + " already exists...skipping"
-            try:
-               os.mkdir(train_dir+"/"+d)
-               print "Created directory " + train_dir+"/"+d
-            except:
-               print "Directory " + train_dir + "/" + d + " already exists...skipping"
 
-            # take 90% of those images for training, rest for validation
-            num = int(math.ceil(.9*len(imgs)))
 
-            train_imgs = imgs[:num]
-            val_imgs = imgs[num:]
 
-            # now that we have a list of train and val for the certain label, symlink them
-
-            for im in train_imgs:
-               og_path = data_dir+"/"+current_label+"/"+im
-               img_path = train_dir+"/"+current_label+"/"+im
-
-               # symlink(src, dst)
-               try:
-                  os.symlink(og_path, img_path)
-               except:
-                  print "File exists...skipping"
-                  continue
-
-            for im in val_imgs:
-               og_path = data_dir+"/"+current_label+"/"+im
-               img_path = val_dir+"/"+current_label+"/"+im
-
-               try:
-                  os.symlink(og_path, img_path)
-               except:
-                  print "File exists...skipping"
-                  continue
-'''
