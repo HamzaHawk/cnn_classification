@@ -3,7 +3,7 @@ Cameron Fabbri
 
 Creating three records, one train, one test, and one val, from the bird dataset
 
-These records are generated from the $DATA_DIR. See the README for more info atm
+These records are generated from the config file. See the README for more info atm
 
 """
 
@@ -17,6 +17,12 @@ import os
 def _bytes_feature(value):
    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
+"""
+
+Creates one-hot vectors for all labels and dictionary
+mapping those labels to the original
+
+"""
 def getLabelMap(data_dir, dataset):
    label_mapper = dict()
 
@@ -31,6 +37,11 @@ def getLabelMap(data_dir, dataset):
          i += 1
    return label_mapper
 
+"""
+
+Main
+
+"""
 def setup(data_dir, dataset):
 
    # creates the mapping of labels to one-hot vectors
@@ -38,7 +49,6 @@ def setup(data_dir, dataset):
 
    # define the shape each image will be resized to
    SHAPE = (100, 100)
-
 
    # create a records directory if there isn't one already
    try:
@@ -66,9 +76,6 @@ def setup(data_dir, dataset):
    test_writer  = tf.python_io.TFRecordWriter(test_record)
    val_writer   = tf.python_io.TFRecordWriter(val_record)
 
-   # loop through train test and val directories and write each image and label to the respective record
-   # TODO need to convert labels to one-hot vectors, maybe have a function that does it or something
-
    t = ["/test/", "/val/", "/train/"]
 
    for a in t:
@@ -92,6 +99,7 @@ def setup(data_dir, dataset):
                   # flatten image
                   img_flat = img.flatten()
 
+                  # _bytes_feature requires inputs as strings
                   example = tf.train.Example(features=tf.train.Features(feature={
                           'image': _bytes_feature(img.tostring()),
                           'label': _bytes_feature(hot_label.tostring())}))
@@ -106,9 +114,6 @@ if __name__ == "__main__":
    data_dir = config.data_dir
    dataset  = config.dataset
    setup(data_dir, dataset)
-
-
-
 
 
 
