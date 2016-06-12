@@ -14,16 +14,32 @@ import cv2
 import os
 
 # helper function
-def _bytes_features(value):
+def _bytes_feature(value):
    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
 
-def setup():
+def getLabelMap(data_dir, dataset):
+   label_mapper = dict()
+
+   num_labels = len([name for name in os.listdir(data_dir+"/"+dataset+"/images/")])
+   i = 0
+   for root, dirs, files in os.walk(data_dir+"/"+dataset+"/images"):
+      for d in dirs:
+         hot_label = np.zeros(num_labels)
+         current_label = d
+         hot_label[i] = 1
+         label_mapper[current_label] = hot_label
+         i += 1
+   return label_mapper
+
+def setup(data_dir, dataset):
+
+   # creates the mapping of labels to one-hot vectors
+   label_mapper = getLabelMap(data_dir, dataset)
+
    # define the shape each image will be resized to
    SHAPE = (100, 100)
 
-   data_dir = config.data_dir
-   dataset  = config.dataset
-   
+
    # create a records directory if there isn't one already
    try:
       os.mkdir(data_dir+"/"+dataset+"/records")
@@ -35,14 +51,22 @@ def setup():
    test_record  = data_dir+"/"+dataset+"/records/test.tfrecord"
    val_record   = data_dir+"/"+dataset+"/records/val.tfrecord"
 
+   # check if they have run create_test_train_val first
+   if os.path.isdir(data_dir+"/"+dataset+"/records/") is False:
+      print "No records directory found in " + data_dir+"/"+dataset + " ... creating one"
+      try:
+         os.mkdir(data_dir+"/"+dataset+"/records")
+      except:
+         print "Could not create directory. Please run command: mkdir " + data_dir+"/"+dataset+"/records"
+         print "Or check config.py for correct paths (permission error??)"
+         exit()
+
    # tf writer for train test and val
    train_writer = tf.python_io.TFRecordWriter(train_record)
    test_writer  = tf.python_io.TFRecordWriter(test_record)
    val_writer   = tf.python_io.TFRecordWriter(val_record)
 
-   #image = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
    # loop through train test and val directories and write each image and label to the respective record
-  
    # TODO need to convert labels to one-hot vectors, maybe have a function that does it or something
 
    t = ["/test/", "/val/", "/train/"]
@@ -53,15 +77,35 @@ def setup():
             label = d
             for r, l, images in os.walk(data_dir+"/"+dataset+a+label):
                for image in images:
-                  img_src = data_dir+"/"+dataset+a+label+"/"+image
-                  img = cv2.resize(img_src, SHAPE, interpolation = cv2.INTER_CUBIC)
-                  example = tf.train.Example(features=tf.train.Features(feature={
-                          'image': _bytes_feature(frame_raw),
-                          'label': })) 
+                  # get the one-hot vector label for the current image
+                  hot_label = label_mapper[label]
 
+                  # location of image
+                  img_src = data_dir+"/"+dataset+a+label+"/"+image
+
+                  # read image in
+                  img = cv2.imread(img_src)
+
+                  # resize image
+                  img = cv2.resize(img, SHAPE, interpolation = cv2.INTER_CUBIC)
+
+                  # flatten image
+                  img_flat = img.flatten()
+
+                  example = tf.train.Example(features=tf.train.Features(feature={
+                          'image': _bytes_feature(img.tostring()),
+                          'label': _bytes_feature(hot_label.tostring())}))
+                  if a == "/test/":
+                     test_writer.write(example.SerializeToString())
+                  elif a == "/val/":
+                     val_writer.write(example.SerializeToString())
+                  elif a == "/train/":
+                     train_writer.write(example.SerializeToString())
 
 if __name__ == "__main__":
-   setup()
+   data_dir = config.data_dir
+   dataset  = config.dataset
+   setup(data_dir, dataset)
 
 
 
