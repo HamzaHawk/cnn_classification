@@ -87,7 +87,6 @@ def setup(data_dir, dataset):
                for image in images:
                   # get the one-hot vector label for the current image
                   hot_label = label_mapper[label]
-
                   # location of image
                   img_src = data_dir+"/"+dataset+a+label+"/"+image
 
@@ -98,12 +97,13 @@ def setup(data_dir, dataset):
                   img = cv2.resize(img, SHAPE, interpolation = cv2.INTER_CUBIC)
 
                   # flatten image
-                  img_flat = img.flatten()
-
+                  #img_flat = img.flatten()
+                  img_flat = np.reshape(img,[1,100*100*3])
+                  hot_label_flat = np.reshape(hot_label,[1,200])
                   # _bytes_feature requires inputs as strings
                   example = tf.train.Example(features=tf.train.Features(feature={
-                          'image': _bytes_feature(img.tostring()),
-                          'label': _bytes_feature(hot_label.tostring())}))
+                          'image': _bytes_feature(img_flat.tostring()),
+                          'label': _bytes_feature(hot_label_flat.tostring())}))
                   if a == "/test/":
                      test_writer.write(example.SerializeToString())
                   elif a == "/val/":

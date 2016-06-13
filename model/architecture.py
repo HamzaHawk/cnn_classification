@@ -89,9 +89,8 @@ def _fc_layer(inputs, hiddens, idx, flat = False, linear = False):
 
 
 def inference(images):
-   
            # input, kernel size, stride, num_features, num_epochs
-   conv1 = _conv_layer(images, 5, 5, 32, 1) 
+   conv1 = _conv_layer(images, 5, 3, 32, 1) 
 
    conv2 = _conv_layer(conv1, 2, 2, 32, 2) 
 

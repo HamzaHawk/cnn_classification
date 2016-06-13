@@ -39,8 +39,9 @@ def train():
       sess.run(init)
       print "Running session"
 
+      tf.train.start_queue_runners(sess=sess)
+
       for i in xrange(1000):
-         print "Before loss value"
          _, loss_value = sess.run([train_op, loss])
          print "Loss: " + str(loss_value)
 
