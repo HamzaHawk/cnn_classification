@@ -55,39 +55,23 @@ if __name__ == "__main__":
    # TODO make it so the user can delete the files in the test train val dirs if they run this script
    # twice, could be useful if they get more data or want to change the split size
 
-   """
-   if len(sys.argv) < 2:
-      print
-      print "Usage: python create_test_train_val.py [dataset]"
-      print "[dataset] is the name of your dataset (the directory name) in $DATA_DIR"
-      print "Do not put a / at the end of the directory name"
-      try:
-         print "Current $DATA_DIR: " + str(os.environ['DATA_DIR'])
-      except:
-         print "$DATA_DIR not set. Set with `export DATA_DIR=/path/to/data_root` or put in ~/.bashrc"
-      print
-      exit()
-   """
-
    # split parameters
    train_perc = .80
    test_perc  = .1
    val_perc   = .1
 
    # name of the dataset, i.e the folder name in $DATA_DIR
-   # dataset = sys.argv[1]
    dataset = config.dataset
 
    # the main directory containing all datasets
-   #data_dir  = os.environ['DATA_DIR']
    data_dir = config.data_dir
-  
-   # the directory of the dataset we are using 
+
+   # the directory of the dataset we are using
    dataset_dir = data_dir + "/" + dataset + "/images"
 
    train_dir = data_dir + "/" + dataset + "/train"
-   test_dir  = data_dir + "/" + dataset + "/test" 
-   val_dir   = data_dir + "/" + dataset + "/val" 
+   test_dir  = data_dir + "/" + dataset + "/test"
+   val_dir   = data_dir + "/" + dataset + "/val"
 
    label_list = list()
 
@@ -97,9 +81,6 @@ if __name__ == "__main__":
    for root, dirs, files in os.walk(dataset_dir):
       for label in dirs:
          label_list.append(label)
-   
-   # TODO create a mapping from label to one-hot vector
-   # for now just find the position the label is in the label_list, and create that instance as the 1 in the vector
 
    # creating the test train and val directories
    try:
@@ -118,7 +99,7 @@ if __name__ == "__main__":
       # this will just give the image names
       #image_list = os.listdir(dataset_dir+"/"+label)
 
-      # shuffle the list so we get a random subset for train test val      
+      # shuffle the list so we get a random subset for train test val
       shuffle(image_list)
       train_num = int(math.ceil(train_perc*len(image_list)))
       train_set = image_list[:train_num]
@@ -133,16 +114,16 @@ if __name__ == "__main__":
          os.mkdir(data_dir + "/" + dataset + "/test/" + label)
          os.mkdir(data_dir + "/" + dataset + "/val/" + label)
       except:
-         continue   
-     
-      # now symlink the images in each list to their respective directory 
+         continue
+
+      # now symlink the images in each list to their respective directory
       for image in test_set:
          im_name = ntpath.basename(image)
          try:
             os.symlink(image, data_dir+"/"+dataset+"/test/"+label+"/"+im_name)
          except:
             continue
-      
+
       for image in train_set:
          im_name = ntpath.basename(image)
          try:

@@ -78,6 +78,7 @@ def setup(data_dir, dataset):
 
    t = ["/test/", "/val/", "/train/"]
 
+   print "Creating records...\n"
    for a in t:
       for root, dirs, files in os.walk(data_dir+"/"+dataset+a):
          for d in dirs:
@@ -114,6 +115,6 @@ if __name__ == "__main__":
    data_dir = config.data_dir
    dataset  = config.dataset
    setup(data_dir, dataset)
-
+   print "Done"
 
 
