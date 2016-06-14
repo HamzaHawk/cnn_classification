@@ -55,6 +55,9 @@ def inputs(data):
    type_input = "train"
    return bird_input.inputs(type_input, batch_size, num_epochs)
 
+def maxpool2d(x, k=2):
+   # MaxPool2D wrapper
+   return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1], padding='SAME')
 
 def _conv_layer(inputs, kernel_size, stride, num_features, idx):
    with tf.variable_scope('{0}_conv'.format(idx)) as scope:
@@ -78,35 +81,38 @@ def _fc_layer(inputs, hiddens, idx, flat = False, linear = False):
     else:
       dim = input_shape[1]
       inputs_processed = inputs
-    
+
     weights = _variable_with_weight_decay('weights', shape=[dim,hiddens],stddev=0.01, wd=FLAGS.weight_decay)
     biases = _variable_on_cpu('biases', [hiddens], tf.constant_initializer(0.01))
     if linear:
       return tf.add(tf.matmul(inputs_processed,weights),biases,name=str(idx)+'_fc')
-  
+
     ip = tf.add(tf.matmul(inputs_processed,weights),biases)
     return tf.maximum(FLAGS.alpha*ip,ip,name=str(idx)+'_fc')
 
 
 def inference(images):
            # input, kernel size, stride, num_features, num_epochs
-   conv1 = _conv_layer(images, 5, 3, 32, 1) 
+   conv1 = _conv_layer(images, 5, 3, 32, 1)
+   conv1 = maxpool2d(conv1, k=2)
 
-   conv2 = _conv_layer(conv1, 2, 2, 32, 2) 
+   conv2 = _conv_layer(conv1, 2, 2, 32, 2)
 
-   conv3 = _conv_layer(conv2, 5, 1, 64, 3) 
+   conv3 = _conv_layer(conv2, 5, 1, 64, 3)
 
-   conv4 = _conv_layer(conv3, 2, 2, 32, 4) 
+   conv4 = _conv_layer(conv3, 2, 2, 32, 4)
 
-   fc5 = _fc_layer(conv4, 512, 5, True, False)
+   conv5 = _conv_layer(conv4, 2, 1, 32, 5)
+
+   fc5 = _fc_layer(conv5, 512, 5, True, False)
 
    fc5_dropout = tf.nn.dropout(fc5, .5)
 
    # 200 is the number of classes
    y_1 = _fc_layer(fc5_dropout, 200, 6, False, False)
-  
+
    y_1 = tf.nn.softmax(y_1)
- 
+
    _activation_summary(y_1)
 
    return y_1

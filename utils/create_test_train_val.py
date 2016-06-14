@@ -56,9 +56,9 @@ if __name__ == "__main__":
    # twice, could be useful if they get more data or want to change the split size
 
    # split parameters
-   train_perc = .80
-   test_perc  = .1
-   val_perc   = .1
+   train_perc = config.train_perc
+   test_perc  = config.test_perc
+   val_perc   = config.val_perc
 
    # name of the dataset, i.e the folder name in $DATA_DIR
    dataset = config.dataset

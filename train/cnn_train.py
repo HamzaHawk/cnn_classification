@@ -32,7 +32,7 @@ def train():
 
       init = tf.initialize_all_variables()
       print "Initialized variables 2"
-      
+
       sess = tf.Session()
       print "Made session"
 
@@ -44,7 +44,6 @@ def train():
       for i in xrange(1000):
          _, loss_value = sess.run([train_op, loss])
          print "Loss: " + str(loss_value)
-
 
 
 def main(argv=None):
