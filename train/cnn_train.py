@@ -25,30 +25,22 @@ def train():
    with tf.Graph().as_default():
       global_step = tf.Variable(0, trainable=False)
 
-
       # saver for the model
       saver = tf.train.Saver(tf.all_variables())
 
       images, labels = bird_input.inputs("train", 10, 1)
-      print "Got images and labels"
 
       logits = architecture.inference(images)
-      print "Got logits"
 
       loss = architecture.loss(logits, labels)
-      print "Got loss"
 
       train_op = tf.train.AdamOptimizer(learning_rate=0.00005).minimize(loss)
-      print "Made train_op"
 
       variables = tf.all_variables()
-      print "Initialized variables"
 
       init = tf.initialize_all_variables()
-      print "Initialized variables 2"
 
       sess = tf.Session()
-      print "Made session"
 
       # summary for tensorboard graph
       summary_op = tf.merge_all_summaries()
