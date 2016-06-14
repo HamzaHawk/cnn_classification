@@ -61,7 +61,8 @@ and create a TF Record for each *folder*. The resulting records will be stored i
 `train.tfrecord`, `test.tfrecord`, and `val.tfrecord` respectively.
 
 
-
+### Tensorboard
+Tensorboard can be viewed at http://localhost:6006 by running `tensorboard --logdir=/home/fabbric/data_dir/birds_2011/models`
 
 
 
