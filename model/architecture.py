@@ -55,9 +55,6 @@ def inputs(data):
    type_input = "train"
    return bird_input.inputs(type_input, batch_size, num_epochs)
 
-def maxpool2d(x, k=2):
-   # MaxPool2D wrapper
-   return tf.nn.max_pool(x, ksize=[1, k, k, 1], strides=[1, k, k, 1], padding='SAME')
 
 def _conv_layer(inputs, kernel_size, stride, num_features, idx):
    with tf.variable_scope('{0}_conv'.format(idx)) as scope:
@@ -71,6 +68,7 @@ def _conv_layer(inputs, kernel_size, stride, num_features, idx):
       #Leaky ReLU
       conv_rect = tf.maximum(FLAGS.alpha*conv_biased, conv_biased, name='{0}_conv'.format(idx))
       return conv_rect
+
 
 def _fc_layer(inputs, hiddens, idx, flat = False, linear = False):
   with tf.variable_scope('fc{0}'.format(idx)) as scope:
@@ -93,8 +91,7 @@ def _fc_layer(inputs, hiddens, idx, flat = False, linear = False):
 
 def inference(images):
            # input, kernel size, stride, num_features, num_epochs
-   conv1 = _conv_layer(images, 5, 3, 32, 1)
-   conv1 = maxpool2d(conv1, k=2)
+   conv1 = _conv_layer(images, 5, 2, 32, 1)
 
    conv2 = _conv_layer(conv1, 2, 2, 32, 2)
 
@@ -119,9 +116,10 @@ def inference(images):
 
 
 def loss (logits, labels):
-  """ cross entropy loss by converting correcte_output to a one hot vector"""
-  #correct_output_one_hot = architecture.one_hot(correct_output)
-  error = tf.reduce_mean(-tf.reduce_sum(labels * tf.log(logits), reduction_indices=[1]))
-  return error
+   """ cross entropy loss by converting correcte_output to a one hot vector"""
+   #correct_output_one_hot = architecture.one_hot(correct_output)
+   error = tf.reduce_mean(-tf.reduce_sum(labels * tf.log(logits), reduction_indices=[1]))
+   tf.scalar_summary('loss', error)
+   return error
 
 
