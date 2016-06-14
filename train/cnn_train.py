@@ -38,7 +38,7 @@ def train():
       loss = architecture.loss(logits, labels)
       print "Got loss"
 
-      train_op = tf.train.AdamOptimizer(learning_rate=0.00001).minimize(loss)
+      train_op = tf.train.AdamOptimizer(learning_rate=0.00005).minimize(loss)
       print "Made train_op"
 
       variables = tf.all_variables()
