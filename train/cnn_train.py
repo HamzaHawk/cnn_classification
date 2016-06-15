@@ -25,8 +25,6 @@ def train():
    with tf.Graph().as_default():
       global_step = tf.Variable(0, trainable=False)
 
-      # saver for the model
-      saver = tf.train.Saver(tf.all_variables())
 
       images, labels = bird_input.inputs("train", 10, 1)
 
@@ -51,9 +49,12 @@ def train():
       graph_def = sess.graph.as_graph_def(add_shapes=True)
       summary_writer = tf.train.SummaryWriter(checkpoint_dir+"training", graph_def=graph_def)
 
+      # saver for the model
+      saver = tf.train.Saver(tf.all_variables())
+      
       tf.train.start_queue_runners(sess=sess)
 
-      for step in xrange(50000):
+      for step in xrange(10000):
          _, loss_value = sess.run([train_op, loss])
          print "Loss: " + str(loss_value)
 

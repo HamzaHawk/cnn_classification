@@ -15,10 +15,6 @@ import architecture
 eval_dir = config.eval_dir
 checkpoint_dir = config.checkpoint_dir
 
-def eval_once(saver, summary_writer, top_k_op, summary_op):
-   print "Evaluating..."
-
-
 def eval():
    with tf.Graph().as_default() as graph:
 
@@ -26,39 +22,42 @@ def eval():
 
       logits = architecture.inference(images)
 
+      # the in_top_k function requires the labels to be a vector of size batch_size
+      # and for each element to be the label, so take the argmax for each
+      labels = tf.argmax(labels, 1)
+
       # calculate predictions -> (predictions, targets, k)
       top_k_op = tf.nn.in_top_k(logits, labels, 1)
 
       sess = tf.Session()
+
+      variables_to_restore = tf.all_variables()
+
+      saver = tf.train.Saver(variables_to_restore)
 
       # summary for tensorboard graph
       summary_op = tf.merge_all_summaries()
       
       summary_writer = tf.train.SummaryWriter(eval_dir,  graph)     
 
-      eval_once(saver, summary_writer, top_k_op, summary_op) 
-   
       with tf.Session() as sess:
          # get the directory where models are stored
+         
          ckpt = tf.train.get_checkpoint_state(checkpoint_dir)
+         saver.restore(sess, ckpt.model_checkpoint_path)
 
-         # restore a model
-         saver.restore(sess, checkpoint_dir)
-
-         # extract the global step
          global_step = ckpt.model_checkpoint_path.split('/')[-1].split('-')[-1]
-
          coord = tf.train.Coordinator()
 
          try:
+            tf.train.start_queue_runners(sess=sess)
             threads = []
-
             for q in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):
-               threads.extend(qr.create_threads(sess, coord=coord, daemon=True, start=True))
+               threads.extend(q.create_threads(sess, coord=coord, daemon=True, start=True))
                # change this later
-               num_examples = 1139
-               batch_size = 30
-               num_iter = int(math.ceit(num_examples / batch_size))
+               num_examples = 1140
+               batch_size = 10
+               num_iter = int(math.ceil(num_examples / batch_size))
                true_count = 0
                total_sample_count = num_iter * batch_size
                step = 0
@@ -67,9 +66,17 @@ def eval():
                   true_count += np.sum(predictions)
                   step += 1
 
-               precisions = true_count / total_sample_count
-               print "precisions: " + str(precisions)
-         except:
+            print "\n\n"
+            print "true: " + str(true_count)
+            print "total: " + str(total_sample_count)
+            precisions = float(float(true_count) / float(total_sample_count))
+            print str(precisions) + "% correct"
+            print "\n\n"
+         except Exception as e:
+            print "\nFailed"
+            print e
+            print
+            coord.request_stop(e)
             exit()
 
          coord.request_stop()
