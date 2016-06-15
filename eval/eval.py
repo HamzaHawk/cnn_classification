@@ -20,7 +20,7 @@ def eval():
 
       images, labels = bird_input.inputs("test", 10, 1)
 
-      logits = architecture.inference(images)
+      logits = architecture.inference(images, "test")
 
       # the in_top_k function requires the labels to be a vector of size batch_size
       # and for each element to be the label, so take the argmax for each

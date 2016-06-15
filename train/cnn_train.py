@@ -28,7 +28,7 @@ def train():
 
       images, labels = bird_input.inputs("train", 10, 1)
 
-      logits = architecture.inference(images)
+      logits = architecture.inference(images, "train")
 
       loss = architecture.loss(logits, labels)
 
@@ -54,7 +54,7 @@ def train():
       
       tf.train.start_queue_runners(sess=sess)
 
-      for step in xrange(10000):
+      for step in xrange(20000):
          _, loss_value = sess.run([train_op, loss])
          print "Loss: " + str(loss_value)
 

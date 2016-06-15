@@ -11,7 +11,7 @@ test_perc  = 0.10
 val_perc   = 0.00
 
 # model checkpoint path
-checkpoint_dir = data_dir+"/"+dataset+"/models/"
+checkpoint_dir = "../models/"
 
 # directory to store evaluation logs
-eval_dir = data_dir+"/"+dataset+"/evaluations/"
+eval_dir = "../evaluations/"

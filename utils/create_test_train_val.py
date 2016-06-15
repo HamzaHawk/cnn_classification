@@ -3,7 +3,7 @@
 Cameron Fabbri
 06/08/2016
 
-Script that will create symbolic links to different files for train test and val.
+Script that will create symbolic links to different files for train and test.
 The following folders are all contained in $DATA_DIR
 A real directory structure is shown in tree.txt
 tensorflow requires the folder structure to be:
@@ -16,28 +16,17 @@ tensorflow requires the folder structure to be:
    $TRAIN_DIR/cat/my-image.jpeg
    $TRAIN_DIR/cat/my-image.JPG
    ...
-   $VALIDATION_DIR/dog/imageA.jpeg
-   $VALIDATION_DIR/dog/imageB.jpg
-   $VALIDATION_DIR/dog/imageC.png
-   ...
-   $VALIDATION_DIR/cat/weird-image.PNG
-   $VALIDATION_DIR/cat/that-image.jpg
-   $VALIDATION_DIR/cat/cat.JPG
-   ...
+   
    $TEST_DIR/dog/imageA.jpeg
    $TEST_DIR/dog/imageB.jpg
    $TEST_DIR/dog/imageC.png
    ...
    $TEST_DIR/cat/weird-image.PNG
-   $VALIDATION_DIR/cat/that-image.jpg
-   $VALIDATION_DIR/cat/cat.JPG
-   Input is a root folder containing all image folders (data_dir)
 
    img_data_dir/
       - images
       - train
       - test
-      - val
 
 """
 
@@ -52,13 +41,13 @@ import config
 
 if __name__ == "__main__":
 
-   # TODO make it so the user can delete the files in the test train val dirs if they run this script
+   # TODO make it so the user can delete the files in the test train dirs if they run this script
    # twice, could be useful if they get more data or want to change the split size
 
    # split parameters
    train_perc = config.train_perc
    test_perc  = config.test_perc
-   val_perc   = config.val_perc
+   #val_perc   = config.val_perc
 
    # name of the dataset, i.e the folder name in $DATA_DIR
    dataset = config.dataset
@@ -71,7 +60,7 @@ if __name__ == "__main__":
 
    train_dir = data_dir + "/" + dataset + "/train"
    test_dir  = data_dir + "/" + dataset + "/test"
-   val_dir   = data_dir + "/" + dataset + "/val"
+   #val_dir   = data_dir + "/" + dataset + "/val"
 
    label_list = list()
 
@@ -86,7 +75,7 @@ if __name__ == "__main__":
    try:
       os.mkdir(data_dir + "/" + dataset + "/test")
       os.mkdir(data_dir + "/" + dataset + "/train")
-      os.mkdir(data_dir + "/" + dataset + "/val")
+      #os.mkdir(data_dir + "/" + dataset + "/val")
    except:
       pass
       #print "Directory already exists"
@@ -105,14 +94,15 @@ if __name__ == "__main__":
       train_set = image_list[:train_num]
 
       test_num  = int(math.ceil(test_perc*len(image_list)))
-      test_set  = image_list[train_num:train_num+test_num]
-      val_set   = image_list[train_num+test_num:]
+      #test_set  = image_list[train_num:train_num+test_num]
+      test_set  = image_list[train_num:]
+      #val_set   = image_list[train_num+test_num:]
 
       # create a directory for the current label in test, val, and train
       try:
          os.mkdir(data_dir + "/" + dataset + "/train/" + label)
          os.mkdir(data_dir + "/" + dataset + "/test/" + label)
-         os.mkdir(data_dir + "/" + dataset + "/val/" + label)
+         #os.mkdir(data_dir + "/" + dataset + "/val/" + label)
       except:
          continue
 
@@ -131,13 +121,14 @@ if __name__ == "__main__":
          except:
             continue
 
+      """
       for image in val_set:
          im_name = ntpath.basename(image)
          try:
             os.symlink(image, data_dir+"/"+dataset+"/val/"+label+"/"+im_name)
          except:
             continue
-
+      """
 
 
 

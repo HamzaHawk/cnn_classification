@@ -51,9 +51,8 @@ def _activation_summary(x):
   tf.scalar_summary(tensor_name + '/sparsity', tf.nn.zero_fraction(x))
 
 
-def inputs(data):
-   type_input = "train"
-   return bird_input.inputs(type_input, batch_size, num_epochs)
+#def inputs(data, type_input):
+#   return bird_input.inputs(type_input, batch_size, num_epochs)
 
 
 def _conv_layer(inputs, kernel_size, stride, num_features, idx):
@@ -65,6 +64,7 @@ def _conv_layer(inputs, kernel_size, stride, num_features, idx):
 
       conv = tf.nn.conv2d(inputs, weights, strides=[1, stride, stride, 1], padding='SAME')
       conv_biased = tf.nn.bias_add(conv, biases)
+
       #Leaky ReLU
       conv_rect = tf.maximum(FLAGS.alpha*conv_biased, conv_biased, name='{0}_conv'.format(idx))
       return conv_rect
@@ -89,24 +89,29 @@ def _fc_layer(inputs, hiddens, idx, flat = False, linear = False):
     return tf.maximum(FLAGS.alpha*ip,ip,name=str(idx)+'_fc')
 
 
-def inference(images):
+def inference(images, name):
            # input, kernel size, stride, num_features, num_epochs
-   conv1 = _conv_layer(images, 5, 2, 32, 1)
+   conv1 = _conv_layer(images, 4, 2, 128, '1')
 
-   conv2 = _conv_layer(conv1, 2, 2, 32, 2)
+   conv2 = _conv_layer(conv1, 2, 2, 64, '2')
 
-   conv3 = _conv_layer(conv2, 5, 1, 64, 3)
+   conv3 = _conv_layer(conv2, 5, 1, 32, '3')
 
-   conv4 = _conv_layer(conv3, 2, 2, 32, 4)
+   conv4 = _conv_layer(conv3, 2, 2, 64, '4')
 
-   conv5 = _conv_layer(conv4, 2, 1, 32, 5)
+   conv5 = _conv_layer(conv4, 2, 1, 32, '5')
+   
+   conv6 = _conv_layer(conv5, 2, 1, 64, '6')
 
-   fc5 = _fc_layer(conv5, 512, 5, True, False)
-
-   fc5_dropout = tf.nn.dropout(fc5, .5)
+   fc7 = _fc_layer(conv6, 512, '7', True, False)
+  
+   if name == "train": 
+      fc7_dropout = tf.nn.dropout(fc7, .5)
+   elif name == "test":
+      fc7_dropout = tf.nn.dropout(fc7, 1)
 
    # 200 is the number of classes
-   y_1 = _fc_layer(fc5_dropout, 200, 6, False, False)
+   y_1 = _fc_layer(fc7_dropout, 200, '8', False, False)
 
    y_1 = tf.nn.softmax(y_1)
 

@@ -18,18 +18,16 @@ def read_and_decode(filename_queue):
       }
    )
 
-   # convert from a scalar string tensor ot uint8 tensor
-   # image = tf.decode_raw(features['image'], tf.)
    image = tf.decode_raw(features['image'], tf.uint8)
    image = tf.to_float(image, name='float32')
+   
    image = tf.reshape(image, [100,100,3])
    # do some distortions here later
 
    label = tf.decode_raw(features['label'], tf.float64)
    label = tf.to_float(label, name='float32')
+   #label = tf.to_float(label, name='int32')
    label = tf.reshape(label, [200])
-   #exit()
-
 
    return image, label
 
@@ -42,7 +40,7 @@ def inputs(type_input, batch_size, num_epochs):
    else:
       filename = data_dir+"/"+dataset+"/records/test.tfrecord"
 
-   filename_queue = tf.train.string_input_producer( [filename])
+   filename_queue = tf.train.string_input_producer([filename])
 
    print "Reading data"
    image, label = read_and_decode(filename_queue)
