@@ -8,7 +8,6 @@ dataset  = "birds_2011"
 #
 train_perc = 0.90
 test_perc  = 0.10
-val_perc   = 0.00
 
 # model checkpoint path
 checkpoint_dir = "../models/"

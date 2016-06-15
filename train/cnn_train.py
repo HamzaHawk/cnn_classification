@@ -32,7 +32,7 @@ def train():
 
       loss = architecture.loss(logits, labels)
 
-      train_op = tf.train.AdamOptimizer(learning_rate=0.00005).minimize(loss)
+      train_op = tf.train.AdamOptimizer(learning_rate=0.00001).minimize(loss)
 
       variables = tf.all_variables()
 
