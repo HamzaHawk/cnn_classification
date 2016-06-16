@@ -9,16 +9,20 @@ sys.path.insert(0, '../inputs/')
 sys.path.insert(0, '../model/')
 
 import config
-import bird_input
+import input_
 import architecture
 
 eval_dir = config.eval_dir
 checkpoint_dir = config.checkpoint_dir
 
+# number of examples to run
+num_examples = 1100
+batch_size = config.batch_size
+
 def eval():
    with tf.Graph().as_default() as graph:
 
-      images, labels = bird_input.inputs("test", 10, 1)
+      images, labels = input_.inputs("test", 10, 1)
 
       logits = architecture.inference(images, "test")
 
@@ -54,9 +58,7 @@ def eval():
             threads = []
             for q in tf.get_collection(tf.GraphKeys.QUEUE_RUNNERS):
                threads.extend(q.create_threads(sess, coord=coord, daemon=True, start=True))
-               # change this later
-               num_examples = 1140
-               batch_size = 10
+
                num_iter = int(math.ceil(num_examples / batch_size))
                true_count = 0
                total_sample_count = num_iter * batch_size

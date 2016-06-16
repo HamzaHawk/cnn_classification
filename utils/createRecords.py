@@ -13,6 +13,8 @@ import config
 import cv2
 import os
 
+num_classes = config.num_classes
+
 # helper function
 def _bytes_feature(value):
    return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
@@ -99,7 +101,7 @@ def setup(data_dir, dataset):
                   # flatten image
                   #img_flat = img.flatten()
                   img_flat = np.reshape(img,[1,100*100*3])
-                  hot_label_flat = np.reshape(hot_label,[1,200])
+                  hot_label_flat = np.reshape(hot_label,[1,num_classes])
                   # _bytes_feature requires inputs as strings
                   example = tf.train.Example(features=tf.train.Features(feature={
                           'image': _bytes_feature(img_flat.tostring()),

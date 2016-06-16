@@ -5,7 +5,8 @@ import config
 
 data_dir = config.data_dir
 dataset  = config.dataset
-   
+num_classes = config.num_classes
+
 def read_and_decode(filename_queue):
 
    reader = tf.TFRecordReader()
@@ -27,7 +28,7 @@ def read_and_decode(filename_queue):
    label = tf.decode_raw(features['label'], tf.float64)
    label = tf.to_float(label, name='float32')
    #label = tf.to_float(label, name='int32')
-   label = tf.reshape(label, [200])
+   label = tf.reshape(label, [num_classes])
 
    return image, label
 

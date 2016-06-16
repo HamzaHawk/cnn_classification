@@ -8,7 +8,7 @@ FLAGS = tf.app.flags.FLAGS
 
 num_epochs = 100
 
-tf.app.flags.DEFINE_integer('batch_size', 128,
+tf.app.flags.DEFINE_integer('batch_size', config.batch_size,
                             """Number of images to process in a batch.""")
 tf.app.flags.DEFINE_float('weight_decay', 0.0005,
                           """ """)
@@ -16,6 +16,7 @@ tf.app.flags.DEFINE_float('alpha', 0.1,
                           """Leaky RElu param""")
 
 data_dir = config.data_dir
+num_classes = config.num_classes
 
 def _variable_on_cpu(name, shape, initializer):
    with tf.device('/cpu:0'):
@@ -91,27 +92,25 @@ def _fc_layer(inputs, hiddens, idx, flat = False, linear = False):
 
 def inference(images, name):
            # input, kernel size, stride, num_features, num_epochs
-   conv1 = _conv_layer(images, 4, 2, 128, '1')
+   conv1 = _conv_layer(images, 4, 2, 8, '1')
 
-   conv2 = _conv_layer(conv1, 2, 2, 64, '2')
+   conv2 = _conv_layer(conv1, 2, 2, 24, '2')
 
    conv3 = _conv_layer(conv2, 5, 1, 32, '3')
-
+   
    conv4 = _conv_layer(conv3, 2, 2, 64, '4')
 
-   conv5 = _conv_layer(conv4, 2, 1, 32, '5')
-   
-   conv6 = _conv_layer(conv5, 2, 1, 64, '6')
+   conv5 = _conv_layer(conv4, 2, 1, 128, '5')
 
-   fc7 = _fc_layer(conv6, 512, '7', True, False)
+   fc6 = _fc_layer(conv5, 1024, '6', True, False)
   
    if name == "train": 
-      fc7_dropout = tf.nn.dropout(fc7, .5)
+      fc6_dropout = tf.nn.dropout(fc6, .5)
    elif name == "test":
-      fc7_dropout = tf.nn.dropout(fc7, 1)
+      fc6_dropout = tf.nn.dropout(fc6, 1)
 
    # 200 is the number of classes
-   y_1 = _fc_layer(fc7_dropout, 200, '8', False, False)
+   y_1 = _fc_layer(fc6_dropout, num_classes, '8', False, False)
 
    y_1 = tf.nn.softmax(y_1)
 

@@ -8,7 +8,7 @@ sys.path.insert(0, '../inputs/')
 sys.path.insert(0, '../model/')
 
 import config
-import bird_input
+import input_
 import architecture
 
 checkpoint_dir = config.checkpoint_dir
@@ -26,7 +26,7 @@ def train():
       global_step = tf.Variable(0, trainable=False)
 
 
-      images, labels = bird_input.inputs("train", 10, 1)
+      images, labels = input_.inputs("train", 10, 1)
 
       logits = architecture.inference(images, "train")
 
@@ -54,7 +54,7 @@ def train():
       
       tf.train.start_queue_runners(sess=sess)
 
-      for step in xrange(20000):
+      for step in xrange(1000000):
          _, loss_value = sess.run([train_op, loss])
          print "Loss: " + str(loss_value)
 
