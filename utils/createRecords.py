@@ -61,7 +61,6 @@ def setup(data_dir, dataset):
    # define output filenames for the records - good to put them in the $DATA_DIR
    train_record = data_dir+"/"+dataset+"/records/train.tfrecord"
    test_record  = data_dir+"/"+dataset+"/records/test.tfrecord"
-   #val_record   = data_dir+"/"+dataset+"/records/val.tfrecord"
 
    # check if they have run create_test_train_val first
    if os.path.isdir(data_dir+"/"+dataset+"/records/") is False:
@@ -76,9 +75,8 @@ def setup(data_dir, dataset):
    # tf writer for train test and val
    train_writer = tf.python_io.TFRecordWriter(train_record)
    test_writer  = tf.python_io.TFRecordWriter(test_record)
-   #val_writer   = tf.python_io.TFRecordWriter(val_record)
 
-   t = ["/test/", "/val/", "/train/"]
+   t = ["/test/", "/train/"]
 
    print "Creating records...\n"
    for a in t:
@@ -108,8 +106,6 @@ def setup(data_dir, dataset):
                           'label': _bytes_feature(hot_label_flat.tostring())}))
                   if a == "/test/":
                      test_writer.write(example.SerializeToString())
-                  elif a == "/val/":
-                     val_writer.write(example.SerializeToString())
                   elif a == "/train/":
                      train_writer.write(example.SerializeToString())
 
