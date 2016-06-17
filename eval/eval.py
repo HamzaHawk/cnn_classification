@@ -22,9 +22,9 @@ batch_size = config.batch_size
 def eval():
    with tf.Graph().as_default() as graph:
 
-      images, labels = input_.inputs("test", 10, 1)
+      images, labels = input_.inputs("test", batch_size, 1)
 
-      logits = architecture.inference(images, "test")
+      logits = architecture.inference(images, "train")
 
       # the in_top_k function requires the labels to be a vector of size batch_size
       # and for each element to be the label, so take the argmax for each
